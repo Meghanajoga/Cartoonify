@@ -3,11 +3,9 @@ import cv2
 import numpy as np
 from PIL import Image
 
-# ---------------------- Page Config ----------------------
-st.set_page_config(page_title="Cartoonify", page_icon="🎨")
-st.title("🎨 Cartoonify — Image Processing Demo")
+st.set_page_config(page_title="Cartoonify")
+st.title("Cartoonify — Image Processing")
 
-# ---------------------- Sidebar Parameters ----------------------
 st.sidebar.header("Cartoonify Parameters")
 
 num_bilateral = st.sidebar.slider("Number of Bilateral Filters", 1, 20, 7)
@@ -24,10 +22,8 @@ if median_blur_ksize % 2 == 0:
 if edge_block_size % 2 == 0:
     edge_block_size += 1
 
-# ---------------------- File Upload ----------------------
 uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg", "webp"])
 
-# ---------------------- Cartoonify Function ----------------------
 def cartoonify_image(img_bgr, num_bilateral, d, sigma_color, sigma_space, median_blur_ksize, edge_block_size, edge_C):
     if img_bgr is None:
         return None
@@ -60,7 +56,6 @@ def cartoonify_image(img_bgr, num_bilateral, d, sigma_color, sigma_space, median
     cartoon = cv2.bitwise_and(img_color, edges_colored)
     return cartoon
 
-# ---------------------- Process Image ----------------------
 if uploaded_file is not None:
     try:
         # Convert uploaded file to OpenCV image
@@ -84,3 +79,4 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"Error processing image: {e}")
+
