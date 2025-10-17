@@ -57,12 +57,32 @@ def cartoonify_image(img_bgr, num_bilateral, d, sigma_color, sigma_space, median
 
 # Process uploaded file
 if uploaded_file is not None:
+    # Convert uploaded file to NumPy array
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
     img_bgr = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-    cartoon_img = cartoonify_image(img_bgr, num_bilateral, d, sigma_color, sigma_space, median_blur_ksize, edge_block_size, edge_C)
 
-    st.subheader("Original Image")
-    st.image(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB), use_container_width=True)
+    # If OpenCV fails (None), try PIL for webp or other formats
+    if img_bgr is None:
+        try:
+            pil_img = Image.open(uploaded_file).convert("RGB")
+            img_bgr = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
+        except Exception as e:
+            st.error(f"Failed to read image: {e}")
+            img_bgr = None
 
-    st.subheader("Cartoonified Image")
-    st.image(cv2.cvtColor(cartoon_img, cv2.COLOR_BGR2RGB), use_container_width=True)
+    # Only proceed if image is valid
+    if img_bgr is not None:
+        cartoon_img = cartoonify_image(
+            img_bgr, num_bilateral, d, sigma_color, sigma_space,
+            median_blur_ksize, edge_block_size, edge_C
+        )
+
+        st.subheader("Original Image")
+        st.image(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB), use_container_width=True)
+
+        st.subheader("Cartoonified Image")
+        st.image(cv2.cvtColor(cartoon_img, cv2.COLOR_BGR2RGB), use_container_width=True)
+    else:
+        st.warning("Could not process the uploaded image.")
+
+
